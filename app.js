@@ -10,8 +10,6 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
-// const bcrypt = require("bcrypt");
-// const saltRounds = 10;
 
 const app = express();
 
@@ -37,6 +35,7 @@ const userSchema = new mongoose.Schema({
   secret: String,
 });
 
+//initializing passportLocalMongoose with the user Schema
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
@@ -44,6 +43,7 @@ const User = new mongoose.model("User", userSchema);
 
 passport.use(User.createStrategy());
 
+//to serialize the user
 passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
@@ -54,6 +54,7 @@ passport.deserializeUser(function (id, done) {
   });
 });
 
+//google login auth
 passport.use(
   new GoogleStrategy(
     {
@@ -154,21 +155,6 @@ app.post("/register", function (req, res) {
       }
     }
   );
-
-  // bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
-
-  //   const newUser = new User({
-  //     email: req.body.username,
-  //     password: hash,
-  //   });
-  //   newUser.save(function (err) {
-  //     if (!err) {
-  //       res.render("secrets");
-  //     } else {
-  //       console.log(err);
-  //     }
-  //   });
-  // });
 });
 
 app.post("/login", function (req, res) {
@@ -186,22 +172,6 @@ app.post("/login", function (req, res) {
       res.redirect("/login");
     }
   });
-
-  // const username = req.body.username;
-  // const password = req.body.password;
-  // User.findOne({ email: username }, function (err, foundUser) {
-  //   if (!err) {
-  //     if (foundUser) {
-  //       bcrypt.compare(password, foundUser.password, function (err, result) {
-  //         if (result) {
-  //           res.render("secrets");
-  //         }
-  //       });
-  //     }
-  //   } else {
-  //     console.log(err);
-  //   }
-  // });
 });
 
 app.listen(3000, function () {
